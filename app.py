@@ -3,7 +3,10 @@ import requests
 import json
 from flask import Flask, render_template, request, session, url_for, current_app, redirect, flash, Response, send_from_directory
 import random
+import re
 #import string
+from difflib import SequenceMatcher
+
 
 app = Flask(__name__)
 app.secret_key = "hello"
@@ -29,48 +32,74 @@ def home():
 @app.route('/artist_info', methods=['POST'])
 def artist_info():
     artist_name = request.form['artistName']
-
+    artist_found = 1
     print(artist_name)
     song_list = get_artist_song_list(str(artist_name))
-
+    if len(song_list) == 0:
+        artist_found = 0
     session['song_list'] = song_list
     session['artist_name'] = artist_name
     session["current_song"] = ""
+    session["total_points"] = 0
     print(song_list)
     #download_random_song(song_list)
-    return render_template("artist_info.html", artist_name = artist_name, found_songs = len(song_list))
+    return render_template("artist_info.html", artist_name = artist_name, found_songs = len(song_list), artist_found = artist_found)
 
 
 
 @app.route('/game', methods=['GET', 'POST'])
 def game():
     
-    
+    points = 0
     prev_song = session["current_song"]
-    print(prev_song)
     if request.method == "POST":
         answer = request.form['answer']
+        time_left = request.form['points']
         #print(answer)
         #print(session["current_song"])
-        if answer.lower() == session["current_song"].lower():
-            good_answer = 1
+        no_par = session["current_song"].lower()
+        no_par = re.sub("\s?\(.*\)","",no_par)
+        possible_answers = [session["current_song"].lower(), no_par]
+        if answer == "                              ":
+            good_answer = -1
+            points = 0
         else:
-            good_answer = 0
+            if answer.lower() in possible_answers:
+                good_answer = 1
+                points = (float(time_left)/30.0)*500 + 500 #time max -> 1000 pts; time 0 -> 500 pts
+            else:
+                sim = similar(answer.lower(), no_par)
+                print(sim)
+                if sim> 0.6:
+                    good_answer = 3
+                    points = ((float(time_left)/30.0)*500 + 500) * 0.75 #time max -> 750 pts; time 0 ->  pts
+                else:
+                    good_answer = 0
+                    points = 0
+        
     else:
         good_answer = 2
 
+    points = int(points)
+    session["total_points"] += points
     
-    session["current_song"] = get_random_song(session['song_list'])
-    #print("xx")
-    #print(session["current_song"])
-    song_mp3_url = get_random_song_mp3(session['current_song'],session['artist_name'])
+    for i in range(10):
+        session["current_song"] = get_random_song(session['song_list'])
+        song_mp3_url = get_random_song_mp3(session['current_song'],session['artist_name'])
+        if song_mp3_url != "not available":
+            break
     
+    if song_mp3_url == "not available":
+        return "no music files available"
+
     #send_from_directory("static", "static/")
     return render_template("music_game.html", 
                             artist_name = session['artist_name'], 
                             song_url = song_mp3_url, 
                             good_answer = good_answer,
-                            prev_song_title = prev_song)
+                            prev_song_title = prev_song,
+                            total_points = session["total_points"],
+                            last_points = points)
 
 def get_artist_song_list(artist_name):
     song_title_list = []
@@ -79,7 +108,11 @@ def get_artist_song_list(artist_name):
     base_url = "https://www.theaudiodb.com/api/v1/json/1/search.php?s="
     r = requests.get(base_url+str(artist_name))
     #print(r)
-    print(r.json()["artists"][0]["idArtist"])
+    try:
+        if r.json()["artists"][0]["idArtist"] == None:
+            return []
+    except TypeError:
+        return []
     artist_id = r.json()["artists"][0]["idArtist"]
 
     # get discography
@@ -96,6 +129,10 @@ def get_artist_song_list(artist_name):
         for track in r.json()["track"]:
             #print(track["strTrack"])
             song_title_list.append(track["strTrack"])
+            if len(song_title_list) > 300:
+                break
+        if len(song_title_list) > 300:
+            break
     
     return song_title_list
 
@@ -132,10 +169,15 @@ def get_random_song_mp3(random_song, artist_name):
     print(complete_url)
     r = requests.get(complete_url)
     #print(r.json())
-    preview_url = r.json()["data"][0]["preview"]
+    try:
+        preview_url = r.json()["data"][0]["preview"]
+        return preview_url
+    except:
+        print("PREVIEW NOT AVAILABLE!")
+        return "not available"
 
-    return preview_url
-
+def similar(a, b):
+    return SequenceMatcher(None, a, b).ratio()
 
 if __name__ == '__main__':
     #download_random_song(artist_name = "Dawid Podsiadło")

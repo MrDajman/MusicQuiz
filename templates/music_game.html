@@ -17,16 +17,76 @@
     {% elif good_answer == 0 %}
     
     <h3 style="color:red"> Bad answer =( Correct answer was: {{ prev_song_title }} </h3>
+    {% elif good_answer == 3 %}
+    
+    <h3 style="color:green"> Good enough ;) Correct answer was: {{ prev_song_title }} </h3>
+    {% elif good_answer == -1 %}
+    
+    <h3 style="color:blue"> Too late =-< Correct answer was: {{ prev_song_title }} </h3>
     {% endif %}
-    <audio controls autoplay>
+
+    <h4>Last score: {{ last_points }}</h4>
+    <h4>Total score: {{ total_points }}</h4>
+
+    <audio autoplay>
       <source src="{{ song_url }}" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
 
+	<div style="max-width: 400px;margin: auto;text-align: center;">
+  <div class="progress">
+    <div class="progress-bar progress-bar-striped active center-block" role="progressbar" aria-valuenow="" aria-valuemin="0" aria-valuemax="100">
+      <span class="progress-bar-label"></span>
+    </div>
+  </div>
+</div>
+
   <form action="{{ url_for('game') }}" method="post">
-    <input type="text" name="answer" autofocus>
-    <input type="submit">
+    <input type="text" name="answer" autofocus id="answer_text">
+    <input type="submit" value="Send" id="answer_button">
+    <input type="hidden" id="points" name="points" value="-1">
   </form>
+
+  
+
+<script>
+  
+  var countDownDate = new Date().getTime()+30000;
+  // Update the count down every 1 second
+  var x = setInterval(function() {
+    var now = new Date().getTime();
+    // Find the distance between now and the count down date
+    var distance = countDownDate - now;
+      
+    // Time calculations for days, hours, minutes and seconds
+    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((distance % (1000 * 60)) / 100);
+
+    seconds = seconds / 10.0;
+    document.getElementById("points").setAttribute("value",seconds);
+
+    $('.progress-bar').css('width', ((seconds/30.0)*100.0)+"%");
+    // Output the result in an element with id="demo"
+    //document.getElementById("countdown").innerHTML = seconds + "s ";
+      
+    // If the count down is over, write some text 
+    if (distance < 0) {
+      var text_field = document.getElementById("answer_text");
+      text_field.setAttribute("value", "                              ");
+      document.getElementById("answer_button").click();
+
+      //$.post( "/game", {
+      //  javascript_data: 99 
+      //});
+      //window.open("{{ url_for('game') }}","_self")
+    //  clearInterval(x);
+    //  document.getElementById("countdown").innerHTML = "EXPIRED";
+    clearInterval(x);
+    }
+  }, 100);
+  </script>
 
 
 {% endblock %}

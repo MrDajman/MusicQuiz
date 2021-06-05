@@ -10,13 +10,17 @@
 
     <h2>Artist info</h2>
     <br>
+    {% if artist_found == 1 %}
     <h3>Artist name: {{ artist_name }}</h3>
     <h3>Found songs: {{ found_songs }}</h3>
-    
     <br>
     Generate random song:
     <form action="{{ url_for('game') }}" method="get">
       <input type="submit" text = "Generate">
     </form>
+
+    {% else %}
+    <h3>Artist not recognized</h3>
+    {% endif %}
 
 {% endblock %}
