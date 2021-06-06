@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+<title>Game results</title>
+
+{% endblock %}
+
+{% block body %}
+
+    <h2>Game Results</h2>
+    <br>
+    <h3>Artist name: {{ artist_name }}</h3>
+    {% if good_answer == 1 %}
+    <h3 style="color:green"> Good answer!</h3>
+
+    {% elif good_answer == 0 %}
+    
+    <h3 style="color:red"> Bad answer =( Correct answer was: {{ prev_song_title }} </h3>
+    {% elif good_answer == 3 %}
+    
+    <h3 style="color:green"> Good enough ;) Correct answer was: {{ prev_song_title }} </h3>
+    {% elif good_answer == -1 %}
+    
+    <h3 style="color:blue"> Too late =-< Correct answer was: {{ prev_song_title }} </h3>
+    {% endif %}
+
+    <h2>Game results for <b>{{ artist_name }}</b>:</h2>
+    <h3>Total score: {{ total_points }}</h3>
+
+
+{% endblock %}

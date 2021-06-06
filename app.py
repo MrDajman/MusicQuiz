@@ -1,4 +1,3 @@
-from math import e
 import requests
 import json
 from flask import Flask, render_template, request, session, url_for, current_app, redirect, flash, Response, send_from_directory
@@ -41,6 +40,7 @@ def artist_info():
     session['artist_name'] = artist_name
     session["current_song"] = ""
     session["total_points"] = 0
+    session["songs_guessed"] = 0
     print(song_list)
     #download_random_song(song_list)
     return render_template("artist_info.html", artist_name = artist_name, found_songs = len(song_list), artist_found = artist_found)
@@ -53,6 +53,7 @@ def game():
     points = 0
     prev_song = session["current_song"]
     if request.method == "POST":
+        session["songs_guessed"]+=1
         answer = request.form['answer']
         time_left = request.form['points']
         #print(answer)
@@ -76,9 +77,17 @@ def game():
                 else:
                     good_answer = 0
                     points = 0
+        print(session["songs_guessed"])
+        if session["songs_guessed"] >= 10:
+            return render_template("result.html", 
+                            artist_name = session['artist_name'], 
+                            good_answer = good_answer,
+                            prev_song_title = prev_song,
+                            total_points = session["total_points"],
+                            last_points = points)
         
     else:
-        good_answer = 2
+        good_answer = 2 # no post method -> print nothing
 
     points = int(points)
     session["total_points"] += points
