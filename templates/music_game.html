@@ -8,46 +8,49 @@
 
 {% block body %}
 
-    <h2>Game Screen</h2>
+    <h2>Song playing</h2>
     <br>
-    <h3>Artist name: {{ artist_name }}</h3>
+    <h4>Artist name: {{ artist_name }}</h4>
     {% if good_answer == 1 %}
-    <h3 style="color:green"> Good answer!</h3>
+    <h5 style="color:green"> Good answer!</h5>
 
     {% elif good_answer == 0 %}
     
-    <h3 style="color:red"> Bad answer =( Correct answer was: {{ prev_song_title }} </h3>
+    <h5 style="color:red"> Bad answer =( Correct answer was: {{ prev_song_title }} </h5>
     {% elif good_answer == 3 %}
     
-    <h3 style="color:green"> Good enough ;) Correct answer was: {{ prev_song_title }} </h3>
+    <h5 style="color:green"> Good enough ;) Correct answer was: {{ prev_song_title }} </h5>
     {% elif good_answer == -1 %}
     
-    <h3 style="color:blue"> Too late =-< Correct answer was: {{ prev_song_title }} </h3>
+    <h5 style="color:blue"> Too late =-< Correct answer was: {{ prev_song_title }} </h5>
     {% endif %}
 
-    <h4>Last score: {{ last_points }}</h4>
-    <h4>Total score: {{ total_points }}</h4>
+    <p>Last score: {{ last_points }}</p>
+    <p>Total score: {{ total_points }}</p>
 
     <audio autoplay>
       <source src="{{ song_url }}" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
-
+  <br>
 	<div style="max-width: 400px;margin: auto;text-align: center;">
-  <div class="progress">
+  <div class="progress" style="height: 40px;">
     <div class="progress-bar progress-bar-striped active center-block" role="progressbar" aria-valuenow="" aria-valuemin="0" aria-valuemax="100">
       <span class="progress-bar-label"></span>
     </div>
   </div>
 </div>
-
+<br>
   <form action="{{ url_for('game') }}" method="post">
-    <input type="text" name="answer" autofocus id="answer_text">
-    <input type="submit" value="Send" id="answer_button">
+    <input type="text" name="answer" autofocus id="answer_text" class="form-control" autocomplete="off">
+    <br>
+    <input type="submit" value="Guess the song!" id="answer_button" class="btn btn-primary full">
     <input type="hidden" id="points" name="points" value="-1">
   </form>
-
-  
+  <br>
+  <form action="{{ url_for('home') }}" method="get">
+    <input type="submit" value="Home page" id="answer_button" class="btn btn-secondary full btn-sm">
+  </form>
 
 <script>
   

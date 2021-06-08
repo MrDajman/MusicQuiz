@@ -7,13 +7,13 @@
 {% endblock %}
 
 {% block body %}
-
-    <h2>Home Page</h2>
-    <h2>Choose artist:</h2>
+<br>
+    <h5>Choose artist:</h5>
 
     <form action="{{ url_for('artist_info') }}" method="post">
-        <input type="text" name="artistName">
-        <input type="submit">
+        <input type="text" class="form-control" name="artistName" autocomplete="off">
+        <br>
+        <input type="submit" type="button" class="btn btn-primary full">
       </form>
       
 {% endblock %}

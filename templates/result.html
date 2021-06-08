@@ -28,5 +28,17 @@
     <h2>Game results for <b>{{ artist_name }}</b>:</h2>
     <h3>Total score: {{ total_points }}</h3>
 
+    
+    <form action="{{ url_for('artist_info') }}" method="post">
+      <input type="hidden" name="artistName" value="{{ artist_name }}"></input>
+      <input type="submit" value="Play again the same artist" id="answer_button" class="btn btn-primary full" autocomplete="off">
+    </form>
+    <br>
+    <form action="{{ url_for('home') }}" method="get">
+      <input type="submit" value="Home page" id="answer_button" class="btn btn-secondary full btn-sm">
+    </form>
+
+
+
 
 {% endblock %}
