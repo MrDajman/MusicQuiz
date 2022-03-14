@@ -109,7 +109,7 @@ def get_artist_song_list(artist_name):
     song_title_list = []
     # get artist id
     
-    base_url = "https://www.theaudiodb.com/api/v1/json/1/search.php?s="
+    base_url = "https://www.theaudiodb.com/api/v1/json/2/search.php?s="
     r = requests.get(base_url+str(artist_name))
     #print(r)
     try:
@@ -120,7 +120,7 @@ def get_artist_song_list(artist_name):
     artist_id = r.json()["artists"][0]["idArtist"]
 
     # get discography
-    base_url = "https://theaudiodb.com/api/v1/json/1/album.php?i="
+    base_url = "https://theaudiodb.com/api/v1/json/2/album.php?i="
     r = requests.get(base_url+str(artist_id))
 
     for album in (r.json()["album"]):
@@ -128,7 +128,7 @@ def get_artist_song_list(artist_name):
         album_id = album["idAlbum"]
         
         # get songs
-        base_url = "https://theaudiodb.com/api/v1/json/1/track.php?m="
+        base_url = "https://theaudiodb.com/api/v1/json/2/track.php?m="
         r = requests.get(base_url+str(album_id))
         for track in r.json()["track"]:
             #print(track["strTrack"])
